@@ -1,0 +1,174 @@
+# ============================================
+# PIZZA ORDER SYSTEM — Complete Program
+# CS 1300 — Lecture Lab
+# ============================================
+
+# ----- Menu Data -----
+sizes = ["Personal (8\")", "Medium (12\")", "Large (16\")", "Party (20\")"]
+size_prices = [6.99, 9.99, 12.99, 16.99]
+
+topping_names = ["Pepperoni", "Mushrooms", "Green Peppers", "Onions",
+                 "Sausage", "Bacon", "Extra Cheese", "Pineapple"]
+topping_price = 1.50
+
+# ----- Order Storage -----
+order_descriptions = []
+order_prices = []
+
+print("Welcome to the CS 1300 Pizza Shop!\n")
+
+# ===== ORDERING LOOP =====
+while True:
+
+    # --- Display size menu ---
+    print("==============================")
+    print("       PIZZA SIZES")
+    print("==============================")
+    for i in range(len(sizes)):
+        print(f"{i+1}. {sizes[i]:<15} ${size_prices[i]:>5.2f}")
+    print("==============================")
+
+    # --- Get valid size ---
+    while True:
+        choice = input("Pick a size (1-4): ")
+
+        if not choice.isdigit():
+            print("  Please enter a number!")
+            continue
+
+        choice = int(choice)
+
+        if choice < 1 or choice > 4:
+            print("  Choose 1-4.")
+            continue
+
+        size_choice = choice - 1
+        base_price = size_prices[size_choice]
+        break
+
+    # --- Select toppings ---
+    selected_toppings = []
+
+    print("\nAvailable toppings ($1.50 each):")
+    for i in range(len(topping_names)):
+        print(f"{i+1}. {topping_names[i]}")
+
+    while True:
+        topping = input("Add topping # (or 'done'): ").lower()
+
+        if topping == "done":
+            break
+
+        if not topping.isdigit():
+            print("  Invalid input!")
+            continue
+
+        topping = int(topping)
+
+        if topping < 1 or topping > len(topping_names):
+            print("  Invalid number!")
+            continue
+
+        topping_name = topping_names[topping - 1]
+
+        if topping_name in selected_toppings:
+            print(f"  Already added {topping_name}!")
+            continue
+
+        selected_toppings.append(topping_name)
+        print(f"  ✓ Added {topping_name}")
+
+    # --- Calculate and store ---
+    price = base_price + (len(selected_toppings) * topping_price)
+
+    if selected_toppings:
+        description = sizes[size_choice] + " " + ", ".join(selected_toppings)
+    else:
+        description = sizes[size_choice] + " Cheese"
+
+    order_descriptions.append(description)
+    order_prices.append(price)
+
+    # --- Order another? ---
+    while True:
+        again = input("Order another pizza? (yes/no): ").lower()
+
+        if again in ["yes", "y"]:
+            break
+        elif again in ["no", "n"]:
+            ordering = False
+            break
+        else:
+            print("  Please enter yes or no.")
+
+    if again in ["no", "n"]:
+        break
+
+# ===== POST-ORDER =====
+if not order_descriptions:
+    print("\nNo pizzas ordered. See you next time!")
+else:
+    # --- Discount code ---
+    discount = 0
+    attempts = 0
+
+    while attempts < 3:
+        code = input("Enter discount code (or 'none'): ").upper()
+
+        if code == "NONE":
+            break
+        elif code == "STUDENT10":
+            discount = 0.10
+            break
+        elif code == "HALFOFF":
+            discount = 0.50
+            break
+        else:
+            print("Invalid code.")
+            attempts += 1
+
+    if attempts == 3:
+        print("No discount applied.")
+
+    # --- Receipt ---
+    subtotal = 0
+
+    print("\n====================================")
+    print("         YOUR ORDER RECEIPT")
+    print("====================================")
+
+    for i in range(len(order_descriptions)):
+        print(f"{i+1}. {order_descriptions[i]}")
+        print(f"{'':30} ${order_prices[i]:>6.2f}")
+        subtotal += order_prices[i]
+
+    # Apply discount
+    subtotal = subtotal * (1 - discount)
+
+    tax = subtotal * 0.07
+    total = subtotal + tax
+
+    print("------------------------------------")
+    print(f"Subtotal: {'':15} ${subtotal:>6.2f}")
+    print(f"Tax (7%): {'':16} ${tax:>6.2f}")
+    print(f"Total: {'':18} ${total:>6.2f}")
+    print("====================================")
+
+    # --- Most expensive pizza ---
+    max_price = max(order_prices)
+    index = order_prices.index(max_price)
+    print(f"\nMost expensive pizza: {order_descriptions[index]} (${max_price:.2f})")
+
+    # --- Size breakdown ---
+    size_count = [0, 0, 0, 0]
+
+    for desc in order_descriptions:
+        for i in range(len(sizes)):
+            if sizes[i] in desc:
+                size_count[i] += 1
+
+    print("\nPizza count by size:")
+    for i in range(len(sizes)):
+        print(f"{sizes[i]}: {size_count[i]}")
+
+    print("\nThank you for your order!")
